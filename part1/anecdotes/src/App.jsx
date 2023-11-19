@@ -26,7 +26,7 @@ const App=()=>{
   const handleSelected=()=>{
     setSelected(Math.floor(Math.random()*(anecdotes.length)));
   }  
-
+  
   return (<>
     <p>{anecdotes[selected]}</p> 
     <p>has {votes[selected]} votes</p>
