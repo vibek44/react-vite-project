@@ -10,16 +10,16 @@ const  App=()=> {
   const [name, setName]=useState('')
 
   const handleName=(e)=>{
-    setName(e.target.value.trim())
+    setName(e.target.value)
   }
 
   const handleSubmit=(e)=>{
     e.preventDefault()
-    let result =persons.find(person=>person.name.toLowerCase()===name.toLowerCase())
+    let result =persons.find(person=>person.name.toLowerCase()===name.trim().toLowerCase())
     if(result){
        return alert(`${name} is already added in facebook`)
     }
-    const person={name}
+    const person={name:name.trim()}
     setPersons(persons.concat(person))
     setName('')
    
@@ -30,7 +30,7 @@ const  App=()=> {
         <h2>Phonebook</h2> 
         <form onSubmit={handleSubmit}>
           <div>
-           <input type="text" value={name} onChange={handleName}/>
+           <input type="text" onChange={handleName} value={name} />
           </div>
           <div>
            <button type='submit'>Add</button>
