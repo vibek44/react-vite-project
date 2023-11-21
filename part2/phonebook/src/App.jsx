@@ -17,7 +17,7 @@ const  App=()=> {
 
   useEffect(()=>{
     axios.get('http://localhost:3001/persons')
-      .then(res=>setPersons(res.data))    
+    .then(res=>setPersons(res.data))    
   },[])
 
   const peopleToShow=search ?
@@ -25,7 +25,7 @@ const  App=()=> {
     person.name.toLowerCase().includes(search.toLowerCase())
   ):persons
 
-  //const personToShow
+  
   const handleSearch=(e)=>setSearch(e.target.value)
 
   const handleName=(e)=>{
@@ -38,13 +38,19 @@ const  App=()=> {
     e.preventDefault()
     let result =persons.find(person=>person.name.toLowerCase()===name.trim().toLowerCase())
     if(result){
+       setName('')
+       setNumber('')
        return alert(`${name} is already added in facebook`)
     }
-    const person={ name:name.trim(),
-      number:number.toString(),
-      id:persons.length+1
+    const person={ 
+      name:name.trim(),
+      number:number.toString() 
     }
-    setPersons(persons.concat(person))
+
+    axios.post(`http://localhost:3001/persons`, person)
+    .then(res=>{
+      setPersons(persons.concat(res.data))
+    })
     setName('')
     setNumber('')
      
@@ -58,7 +64,9 @@ const  App=()=> {
         <ContactForm name={name} number={number} handleSubmit={handleSubmit} 
          handleNumber={handleNumber} handleName={handleName} />
         <h2>Contact</h2>
-        {peopleToShow.map(person=><Person key={person.id} person={person}/>)}
+        { peopleToShow.map(person=>
+          <Person key={person.id} person={person}/>)
+        }
      </div>
   )
 }
