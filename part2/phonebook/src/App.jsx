@@ -34,18 +34,17 @@ const  App=()=> {
     e.preventDefault()
     let tname=name.trim()
     let tnumber=number.trim()
-    if(tname && tnumber){
+    if(tname && tnumber){                           //update funtionality
       let result =persons.find(person=>person.name.toLowerCase()===tname.toLowerCase())
       if(result){
-        alert(`${result.name} is already added in phonebook,Replace old number with new`)
+        confirm(`${result.name} is already added in phonebook,Replace old number with new`)
         const updatedPerson={...result,number:tnumber}
         contactService
          .update(result.id,updatedPerson)
-         .then(returnedPerson=>{
-             console.log(returnedPerson);
-            setPersons(persons.map(person=>person.id!==returnedPerson.id ? person : returnedPerson ))
+         .then(resData=>{
+            setPersons(persons.map(person=>person.id!==resData.id ? person : resData ))
           })
-      }else{
+      }else{                                         //create functionality
         const person={ 
           name:tname,
           number:tnumber.toString() 
@@ -62,7 +61,7 @@ const  App=()=> {
        alert(`Name or phone input field is empty `)
     }
   }
-  //delete functionality
+                                                     //delete functionality
   const handleRemove=(id)=>{
     const person=persons.find(person=>person.id===id)
     confirm(`Delete ${person.name}`)
