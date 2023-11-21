@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Notification from './components/Notification'
 import Filter from './components/filter'
 import ContactForm from './components/contactform'
 import Person from './components/person'
@@ -11,18 +12,18 @@ const  App=()=> {
   const [name, setName]=useState('')
   const [number, setNumber]=useState('')
   const [search, setSearch]=useState(null)
-
-  useEffect(()=>{
-    contactService
-    .getAll()
-    .then(initialPersons=>setPersons(initialPersons))    
-  },[])
+  const [message, setMessage]=useState({errormsg:null,successmsg:null})
 
   const peopleToShow=search ?
       persons.filter(person=>
         person.name.toLowerCase().includes(search.toLowerCase()))
       :persons
 
+  useEffect(()=>{
+    contactService
+    .getAll()
+    .then(initialPersons=>setPersons(initialPersons))    
+  },[])
   
   const handleSearch=(e)=>setSearch(e.target.value)
 
@@ -44,6 +45,9 @@ const  App=()=> {
          .then(resData=>{
             setPersons(persons.map(person=>person.id!==resData.id ? person : resData ))
           })
+          .catch(err=>{
+            console.log(err.msg);
+          })
       }else{                                         //create functionality
         const person={ 
           name:tname,
@@ -53,9 +57,14 @@ const  App=()=> {
         .create(person)
         .then(resData=>{
           setPersons(persons.concat(resData))
+          setMessage({...message,successmsg:`Added ${resData.name}`})
           setName('')
           setNumber('')
+          setTimeout(() => {
+            setMessage({...message,successmsg:null})
+          },5000);
         })
+        
       }
     }else{
        alert(`Name or phone input field is empty `)
@@ -63,8 +72,8 @@ const  App=()=> {
   }
                                                      //delete functionality
   const handleRemove=(id)=>{
-    const person=persons.find(person=>person.id===id)
-    confirm(`Delete ${person.name}`)
+    const user=persons.find(person=>person.id===id)
+    confirm(`Delete ${user.name}`)
     contactService
     .remove(id)
     .then(res=>{
@@ -72,11 +81,17 @@ const  App=()=> {
         person.id!==id 
       ))
     })
+    .catch(err=>{
+      setMessage({...message,errormsg:`Information of ${user.name} is already deleted`})
+      setTimeout(()=>setMessage({...message,errormsg:null}),5000)
+      setPersons(persons.filter(person=>person.id!==user.id))
+    })
   }
 
   return(
     <div>
       <h2>Phonebook</h2> 
+      <Notification message={message}/>
       <Filter handleSearch={handleSearch}/>
       <h4> Add Contacts</h4>
       <ContactForm name={name} number={number} handleSubmit={handleSubmit} 
